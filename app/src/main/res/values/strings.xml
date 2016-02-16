@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Powy</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="owner">owner</string>
+    <string name="my_bag">my bag</string>
+    <string name="around_me">around me</string>
+    <string name="title">POWY</string>
+    <string name="title_activity_owner">ownerActivity</string>
+    <string name="title_activity_bag_info">bagInfoActivity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
