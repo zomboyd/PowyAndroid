@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Powy</string>
+    <string name="action_settings">Paramètres</string>
+    <string name="around_me">Autour de moi</string>
+    <string name="my_bag">Mon sac</string>
+    <string name="navigation_drawer_close">Fermer la navigation</string>
+    <string name="owner">Propriétaire</string>
+    <string name="title">Powy</string>
+    <string name="navigation_drawer_open">Ouvrir la navigation</string>
+    <string name="title_activity_bag_info">Activité du sac</string>
+    <string name="title_activity_owner">Activité du propriétaire</string>
+</resources>
