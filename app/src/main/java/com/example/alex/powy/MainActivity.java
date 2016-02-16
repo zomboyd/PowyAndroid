@@ -1,5 +1,6 @@
 package com.example.alex.powy;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -11,7 +12,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
+import com.example.alex.powy.controller.connectionController;
 import com.example.alex.powy.fragment.aroundMeFragment;
 import com.example.alex.powy.fragment.bagInfoFragment;
 import com.example.alex.powy.fragment.dashboardFragment;
@@ -19,6 +22,8 @@ import com.example.alex.powy.fragment.ownerFragment;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private connectionController mConnectionController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +37,8 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
+
+        mConnectionController = new connectionController(this);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -105,4 +112,16 @@ public class MainActivity extends AppCompatActivity
 
         return true;
     }
+
+    public void ButtonOnClick(View v) {
+        switch (v.getId()) {
+            case R.id.startB:
+                mConnectionController.turnOn();
+                break;
+            case R.id.stopB:
+                mConnectionController.turnOff();
+                break;
+        }
+    }
+
 }

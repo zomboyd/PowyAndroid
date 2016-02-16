@@ -8,4 +8,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Bluetooth"
+        android:id="@+id/startB"
+        android:onClick="ButtonOnClick" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stop Bluetooth"
+        android:id="@+id/stopB"
+        android:onClick="ButtonOnClick" />
+
 </LinearLayout>
