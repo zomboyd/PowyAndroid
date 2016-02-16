@@ -12,16 +12,19 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.alex.powy.fragment.aroundMeFragment;
 import com.example.alex.powy.fragment.bagInfoFragment;
 import com.example.alex.powy.fragment.dashboardFragment;
 import com.example.alex.powy.fragment.ownerFragment;
+import com.example.alex.powy.fragment.settingsFragment;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -55,7 +58,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.addHeaderView(header);
         //battery
         setBattery(header);
-
+        setDashboard(header);
     }
 
     @Override
@@ -104,7 +107,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.around_me) {
             newFragment = new aroundMeFragment();
         } else if (id == R.id.action_settings) {
-            newFragment = new aroundMeFragment();
+            newFragment = new settingsFragment();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -123,5 +126,22 @@ public class MainActivity extends AppCompatActivity
         int level = batteryIntent != null ? batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) : 0;
         TextView batteryTxt = (TextView) header.findViewById(R.id.owner_txt);
         batteryTxt.setText(String.valueOf(level) + "%");
+    }
+
+    public void setDashboard(View header){
+        //set Dashboard fragment
+        ImageView home_asset = (ImageView) header.findViewById(R.id.dashboard);
+        home_asset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
+                Fragment newFragment = new dashboardFragment();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, newFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
     }
 }
