@@ -1,5 +1,8 @@
 package com.example.alex.powy;
 
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -9,8 +12,11 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import com.example.alex.powy.fragment.aroundMeFragment;
 import com.example.alex.powy.fragment.bagInfoFragment;
@@ -44,6 +50,11 @@ public class MainActivity extends AppCompatActivity
 
         fragment = new dashboardFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, fragment).commit();
+
+        View header = LayoutInflater.from(this).inflate(R.layout.nav_header_main, null);
+        navigationView.addHeaderView(header);
+        //battery
+        setBattery(header);
 
     }
 
@@ -104,5 +115,13 @@ public class MainActivity extends AppCompatActivity
         transaction.commit();
 
         return true;
+    }
+
+    public void setBattery(View header){
+        //battery settings
+        Intent batteryIntent = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int level = batteryIntent != null ? batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) : 0;
+        TextView batteryTxt = (TextView) header.findViewById(R.id.owner_txt);
+        batteryTxt.setText(String.valueOf(level) + "%");
     }
 }

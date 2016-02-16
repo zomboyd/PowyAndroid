@@ -4,21 +4,21 @@
     <group android:checkableBehavior="single" android:menuCategory="container">
         <item
             android:id="@+id/owner"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_account_circle_24dp"
             android:title="@string/owner" />
         <item
             android:id="@+id/my_bag"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_work_24dp"
             android:title="@string/my_bag" />
         <item
             android:id="@+id/around_me"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_my_location_24dp"
             android:title="@string/around_me" />
     </group>
 
     <group android:menuCategory="container" android:checkableBehavior="single" android:orderInCategory="100">
         <item android:id="@+id/action_settings"
-            android:icon="@drawable/ic_menu_share"
+            android:icon="@drawable/ic_settings_24dp"
             android:title="@string/action_settings" />
     </group>
 </menu>
