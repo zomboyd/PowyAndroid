@@ -7,5 +7,21 @@
         android:text="DASHBOARD"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/button2"
+        android:text="Start Services"
+        android:onClick="startService"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/button3"
+        android:text="Stop Services"
+        android:onClick="stopService"
+        android:layout_above="@id/button2"
+        android:layout_centerHorizontal="true" />
 
 </LinearLayout>

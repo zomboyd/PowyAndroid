@@ -17,17 +17,24 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.alex.powy.controller.connectionController;
 import com.example.alex.powy.fragment.aroundMeFragment;
 import com.example.alex.powy.fragment.bagInfoFragment;
 import com.example.alex.powy.fragment.dashboardFragment;
 import com.example.alex.powy.fragment.ownerFragment;
 import com.example.alex.powy.fragment.settingsFragment;
+import com.example.alex.powy.service.BluetoothService;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    //private connectionController mConnectionController;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +49,7 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         if (findViewById(R.id.fragment_container) != null) {
             if (savedInstanceState != null)
@@ -58,7 +65,11 @@ public class MainActivity extends AppCompatActivity
         navigationView.addHeaderView(header);
         //battery
         setBattery(header);
+        //home
         setDashboard(header);
+        //bluetooth
+        //mConnectionController = new connectionController(this);
+
     }
 
     @Override
@@ -120,7 +131,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public void setBattery(View header){
+    public void setBattery(View header) {
         //battery settings
         Intent batteryIntent = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         int level = batteryIntent != null ? batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) : 0;
@@ -128,12 +139,16 @@ public class MainActivity extends AppCompatActivity
         batteryTxt.setText(String.valueOf(level) + "%");
     }
 
-    public void setDashboard(View header){
+    public void setDashboard(View header) {
         //set Dashboard fragment
         ImageView home_asset = (ImageView) header.findViewById(R.id.dashboard);
         home_asset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Log.d("MENU", "CLEAR");
+                //navigationView.getMenu().getItem(0).setChecked(false);
+                //onNavigationItemSelected(navigationView.getMenu().getItem(0));
+
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                 drawer.closeDrawer(GravityCompat.START);
                 Fragment newFragment = new dashboardFragment();
@@ -144,4 +159,36 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
+
+    // Method to start the service bluetooth
+    public void startService(View view) {
+        startService(new Intent(getBaseContext(), BluetoothService.class));
+    }
+
+    // Method to stop the service bluetooth
+    public void stopService(View view) {
+        stopService(new Intent(getBaseContext(), BluetoothService.class));
+    }
+
+
+    //public void ButtonOnClick(View v) {
+    //switch (v.getId()) {
+    //    case R.id.startB:
+    //        mConnectionController.turnOn();
+    //        break;
+    //    case R.id.stopB:
+    //        mConnectionController.turnOff();
+    //        break;
+    //case R.id.startC:
+    //mConnectionController.visibleOn();
+    //  mConnectionController.discoverable();
+    // Log.d("DISCO", String.valueOf(mConnectionController.getDiscoverable()));
+    //ListView li = (ListView) findViewById(R.id.listViewBluetooth);
+    //ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mConnectionController.getDiscoverable());
+    //li.setAdapter(arrayAdapter);
+    //break;
+    //case R.id.stopD:
+    //    mConnectionController.visibleOff();
+    //    break;
+    // }
 }

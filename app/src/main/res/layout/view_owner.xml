@@ -6,6 +6,14 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/ownerTitle"
         android:text="OWNER"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ownerTitle"
+        android:id="@+id/profilPicture"
+        android:layout_gravity="center_horizontal" />
 
 </LinearLayout>
