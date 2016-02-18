@@ -3,6 +3,10 @@
 
     <group android:checkableBehavior="single" android:menuCategory="container">
         <item
+            android:id="@+id/dashboard"
+            android:icon="@drawable/ic_home_24dp"
+            android:title="@string/dashboard" />
+        <item
             android:id="@+id/owner"
             android:icon="@drawable/ic_account_circle_24dp"
             android:title="@string/owner" />

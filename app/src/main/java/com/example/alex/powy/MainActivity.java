@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.alex.powy.controller.TransformBMP;
 import com.example.alex.powy.controller.connectionController;
 import com.example.alex.powy.fragment.aroundMeFragment;
 import com.example.alex.powy.fragment.bagInfoFragment;
@@ -29,6 +30,7 @@ import com.example.alex.powy.fragment.dashboardFragment;
 import com.example.alex.powy.fragment.ownerFragment;
 import com.example.alex.powy.fragment.settingsFragment;
 import com.example.alex.powy.service.BluetoothService;
+import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -111,7 +113,9 @@ public class MainActivity extends AppCompatActivity
 
         int id = item.getItemId();
 
-        if (id == R.id.owner) {
+        if (id == R.id.dashboard) {
+            newFragment = new dashboardFragment();
+        } else if (id == R.id.owner) {
             newFragment = new ownerFragment();
         } else if (id == R.id.my_bag) {
             newFragment = new bagInfoFragment();
@@ -141,14 +145,11 @@ public class MainActivity extends AppCompatActivity
 
     public void setDashboard(View header) {
         //set Dashboard fragment
-        ImageView home_asset = (ImageView) header.findViewById(R.id.dashboard);
+        ImageView home_asset = (ImageView) header.findViewById(R.id.nav_pic);
+        Picasso.with(header.getContext()).load(R.drawable.profil_pic).transform(new TransformBMP()).into(home_asset);
         home_asset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Log.d("MENU", "CLEAR");
-                //navigationView.getMenu().getItem(0).setChecked(false);
-                //onNavigationItemSelected(navigationView.getMenu().getItem(0));
-
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                 drawer.closeDrawer(GravityCompat.START);
                 Fragment newFragment = new dashboardFragment();

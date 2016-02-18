@@ -10,10 +10,10 @@
         android:text="OWNER"/>
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="114dp"
+        android:layout_height="147dp"
         android:layout_below="@id/ownerTitle"
         android:id="@+id/profilPicture"
-        android:layout_gravity="center_horizontal" />
+        android:src="@drawable/profil_pic" />
 
 </LinearLayout>

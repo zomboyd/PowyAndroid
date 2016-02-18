@@ -10,4 +10,5 @@
     <string name="navigation_drawer_open">Ouvrir la navigation</string>
     <string name="title_activity_bag_info">Activité du sac</string>
     <string name="title_activity_owner">Activité du propriétaire</string>
+    <string name="dashboard">Tableau de bord</string>
 </resources>
