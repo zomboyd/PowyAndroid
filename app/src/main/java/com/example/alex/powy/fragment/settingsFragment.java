@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.example.alex.powy.R;
+import com.example.alex.powy.bluetoothServer;
 import com.example.alex.powy.thread.BluetoothServer;
 
 public class settingsFragment extends Fragment implements View.OnClickListener {
@@ -41,6 +42,9 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
     private ArrayAdapter<String> adapter;
     private boolean bluetoothState;
     private boolean searchState = false;
+
+    //SERVER
+    Intent intent;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -67,6 +71,9 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
 
         //INIT BUTTONS
         initButton();
+
+        //TEST BLUETOOTH SERVER
+        intent = new Intent(getActivity(), bluetoothServer.class);
 
         return v;
     }
@@ -105,14 +112,17 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
             case R.id.server: {
                 if (serverState == true) {
                     serverState = false;
-                    blueServ.cancel();
-                    visibleOff();
+                    //blueServ.cancel();
+                    //visibleOff();
                     server_button.setImageResource(R.drawable.ic_portable_wifi_off_24dp);
                 } else if (serverState == false) {
                     serverState = true;
-                    visibleOn();
-                    blueServ = new BluetoothServer(mBluetoothAdapter);
-                    blueServ.run();
+                    startActivity(intent);
+                    //coucou = new BluetoothServerActivity();
+                    //startActivity(coucou.getIntent());
+                    //visibleOn();
+                    //blueServ = new BluetoothServer(mBluetoothAdapter);
+                    //blueServ.run();
                     server_button.setImageResource(R.drawable.ic_wifi_tethering_24dp);
                 }
                 break;
