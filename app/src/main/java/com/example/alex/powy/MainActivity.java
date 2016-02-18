@@ -1,12 +1,8 @@
 package com.example.alex.powy;
 
-<<<<<<< HEAD
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
-=======
-import android.app.Activity;
->>>>>>> aecc11e8a19641295fbc1679bf7a437c3d8cf55e
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -16,22 +12,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-<<<<<<< HEAD
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.alex.powy.controller.TransformBMP;
-=======
-
->>>>>>> aecc11e8a19641295fbc1679bf7a437c3d8cf55e
-import com.example.alex.powy.controller.connectionController;
 import com.example.alex.powy.fragment.aroundMeFragment;
 import com.example.alex.powy.fragment.bagInfoFragment;
 import com.example.alex.powy.fragment.dashboardFragment;
@@ -43,12 +31,7 @@ import com.squareup.picasso.Picasso;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-<<<<<<< HEAD
-    //private connectionController mConnectionController;
     private NavigationView navigationView;
-=======
-    private connectionController mConnectionController;
->>>>>>> aecc11e8a19641295fbc1679bf7a437c3d8cf55e
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,8 +45,6 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
-        mConnectionController = new connectionController(this);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -84,7 +65,6 @@ public class MainActivity extends AppCompatActivity
         //home
         setDashboard(header);
         //bluetooth
-        //mConnectionController = new connectionController(this);
 
     }
 
@@ -134,7 +114,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.around_me) {
             newFragment = new aroundMeFragment();
         } else if (id == R.id.action_settings) {
-            newFragment = new aroundMeFragment();
+            newFragment = new settingsFragment();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -147,7 +127,6 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-<<<<<<< HEAD
     public void setBattery(View header) {
         //battery settings
         Intent batteryIntent = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
@@ -205,17 +184,4 @@ public class MainActivity extends AppCompatActivity
     //    mConnectionController.visibleOff();
     //    break;
     // }
-=======
-    public void ButtonOnClick(View v) {
-        switch (v.getId()) {
-            case R.id.startB:
-                mConnectionController.turnOn();
-                break;
-            case R.id.stopB:
-                mConnectionController.turnOff();
-                break;
-        }
-    }
-
->>>>>>> aecc11e8a19641295fbc1679bf7a437c3d8cf55e
 }

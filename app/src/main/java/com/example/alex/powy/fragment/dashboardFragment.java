@@ -18,11 +18,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.example.alex.powy.R;
 import com.example.alex.powy.bluetoothThread;
-import com.example.alex.powy.controller.connectionController;
 
 import java.util.ArrayList;
 
@@ -35,7 +33,6 @@ public class dashboardFragment extends Fragment implements View.OnClickListener 
     private ArrayList<BluetoothDevice> mDeviceList;
     private ArrayAdapter<String> mArrayAdapter;
     private bluetoothThread mBluetoothThread;
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
