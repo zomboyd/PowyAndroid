@@ -53,4 +53,33 @@
         android:layout_height="match_parent"
         android:id="@+id/list_bluetooth"/>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Bluetooth"
+        android:id="@+id/startB"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stop Bluetooth"
+        android:id="@+id/stopB"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/start_scan"
+        android:text="scan"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stop Co"
+        android:id="@+id/stop_co"/>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/list_bluetooth"/>
+
 </LinearLayout>

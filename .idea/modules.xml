@@ -5,7 +5,10 @@
 <<<<<<< HEAD
 =======
       <module fileurl="file://$PROJECT_DIR$/Powy.iml" filepath="$PROJECT_DIR$/Powy.iml" />
+<<<<<<< HEAD
 >>>>>>> client bluetooth
+=======
+>>>>>>> aecc11e8a19641295fbc1679bf7a437c3d8cf55e
       <module fileurl="file://$PROJECT_DIR$/PowyAndroid.iml" filepath="$PROJECT_DIR$/PowyAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
