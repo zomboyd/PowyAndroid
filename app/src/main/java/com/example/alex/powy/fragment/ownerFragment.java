@@ -19,8 +19,8 @@ public class ownerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.view_owner, container, false);
-        ImageView profil = (ImageView) v.findViewById(R.id.profilPicture);
-        Picasso.with(getContext()).load(R.drawable.profil_pic).transform(new TransformBMP()).into(profil);
+        ImageView profile = (ImageView) v.findViewById(R.id.profilPicture);
+        Picasso.with(getContext()).load(R.drawable.profil_pic).transform(new TransformBMP()).into(profile);
         return v;
     }
 
