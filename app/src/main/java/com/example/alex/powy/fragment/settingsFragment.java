@@ -1,5 +1,7 @@
 package com.example.alex.powy.fragment;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
@@ -7,8 +9,10 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -55,6 +59,8 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
 
+    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
+
     private static final int REQUEST_ENABLE_BT = 1;
     // Stops scanning after 10 seconds.
     private static final long SCAN_PERIOD = 10000;
@@ -74,6 +80,23 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.view_settings, container, false);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Android M Permission check 
+            if (getActivity().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("This app needs location access");
+                builder.setMessage("Please grant location access so this app can detect beacons.");
+                builder.setPositiveButton(android.R.string.ok, null);
+                builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+                    }
+                });
+                builder.show();
+            }
+        }
 
         if (!(supported = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE))) {
             Toast.makeText(getActivity(), "BLE not supported", Toast.LENGTH_SHORT).show();
@@ -211,6 +234,7 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
     ScanCallback mLeScanCallBack = new ScanCallback() {
         public void onScanResult(int callbackType, ScanResult result) {
             mLeDeviceListAdapter.add(result.getDevice().toString());
+            Log.d("BLE", "device found -> " + result.getDevice().toString());
             //result.getDevice().connectGatt(getActivity(), false, new BluetoothLeService().star)
             mLeDeviceListAdapter.notifyDataSetChanged();
         }
