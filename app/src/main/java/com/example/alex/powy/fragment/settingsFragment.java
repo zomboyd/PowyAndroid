@@ -5,7 +5,11 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothProfile;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
@@ -34,6 +38,7 @@ import com.example.alex.powy.thread.BluetoothServer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.UUID;
 
 public class settingsFragment extends Fragment implements View.OnClickListener {
 
@@ -50,6 +55,7 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
     private Handler mHandler = new Handler();
     private BluetoothLeScanner mBluetoothLeScanner;
     private int mConnectionState = STATE_DISCONNECTED;
+    private BluetoothGatt mBluetoothGatt;
 
 
     //SERVER BLUETOOTH STUFF
@@ -72,6 +78,9 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
     private static final int REQUEST_ENABLE_BT = 1;
     // Stops scanning after 10 seconds.
     private static final long SCAN_PERIOD = 10000;
+
+    public final static UUID UUID_HEART_RATE_MEASUREMENT = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
+
 
     public final static String ACTION_GATT_CONNECTED =
             "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
@@ -133,13 +142,14 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
         mLeDeviceListAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item);
         listViewBluetooth.setAdapter(mLeDeviceListAdapter);
 
-        ListView listView = (ListView) getActivity().findViewById(R.id.listViewBluetooth);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listViewBluetooth.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 BluetoothDevice bluetoothDevice = mDeviceList.get(position);
 
-                //bluetoothDevice.connectGatt(getActivity(), false, new BluetoothLeService());
+                Log.d("CONN", "connecting to -> " + bluetoothDevice.getName());
+                mBluetoothGatt = bluetoothDevice.connectGatt(getActivity(), false, mGattCallback);
+                mBluetoothGatt.connect();
             }
         });
 
@@ -171,6 +181,10 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
                     mLeDeviceListAdapter.clear();
                     mLeDeviceListAdapter.notifyDataSetChanged();
                     mBluetoothAdapter.cancelDiscovery();
+                    if (mBluetoothGatt != null) {
+                        mBluetoothGatt.close();
+                        mBluetoothGatt = null;
+                    }
                     search_button.setImageResource(R.drawable.ic_leak_remove_24dp);
                 } else {
                     searchState = true;
@@ -255,7 +269,7 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
         public void onScanResult(int callbackType, ScanResult result) {
             mLeDeviceListAdapter.add(String.format("%s", result.getDevice().getName()));
             mDeviceList.add(result.getDevice());
-            Log.d("BLE", "device found -> " + result.getDevice().toString());
+            Log.d("BLE", "device found -> " + result.getDevice().getName() + ":" + result.getDevice().getAddress());
             mLeDeviceListAdapter.notifyDataSetChanged();
         }
     };
@@ -278,4 +292,107 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
             mBluetoothLeScanner.stopScan(mLeScanCallBack);
         }
     }
+
+    private final BluetoothGattCallback mGattCallback =
+            new BluetoothGattCallback() {
+                @Override
+                public void onConnectionStateChange(BluetoothGatt gatt, int status,
+                                                    int newState) {
+
+                    Log.d("BLE", "on Connection State Change");
+
+                    String intentAction;
+                    if (newState == BluetoothProfile.STATE_CONNECTED) {
+                        Log.d("BLE", "on Connection State Change + State Connected");
+                        intentAction = ACTION_GATT_CONNECTED;
+                        mConnectionState = STATE_CONNECTED;
+                        broadcastUpdate(intentAction);
+                        Log.i("TOTO", "Connected to GATT server.");
+                        Log.i("TOTO", "Attempting to start service discovery:" + mBluetoothGatt.discoverServices());
+
+                    } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                        Log.d("BLE", "on Connection State Change + state Disco");
+                        intentAction = ACTION_GATT_DISCONNECTED;
+                        mConnectionState = STATE_DISCONNECTED;
+                        Log.i("TOTO", "Disconnected from GATT server.");
+                        broadcastUpdate(intentAction);
+                    }
+                }
+
+                @Override
+                // New services discovered
+                public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+
+                    Log.d("BLE", "on Services Discovered");
+
+                    Log.w("TOTO", "onServicesDiscovered received: " + status);
+
+                    if (status == BluetoothGatt.GATT_SUCCESS) {
+                        broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
+                    } else {
+                        Log.w("TOTO", "onServicesDiscovered received: " + status);
+                    }
+                }
+
+                @Override
+                // Result of a characteristic read operation
+                public void onCharacteristicRead(BluetoothGatt gatt,
+                                                 BluetoothGattCharacteristic characteristic,
+                                                 int status) {
+
+                    Log.d("BLE", "on Characteristic Read");
+
+                    if (status == BluetoothGatt.GATT_SUCCESS) {
+                        broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
+                    }
+                }
+            };
+
+    public void sendBroadcast(BluetoothGattCharacteristic characteristic) {
+        characteristic.setValue("?");
+
+        boolean status = mBluetoothGatt.writeCharacteristic(characteristic);
+        Log.d("STAT", "status d'envoi -> " + status);
+    }
+
+    private void broadcastUpdate(final String action) {
+        final Intent intent = new Intent(action);
+        //sendBroadcast(intent);
+    }
+
+    private void broadcastUpdate(final String action,
+                                 final BluetoothGattCharacteristic characteristic) {
+        final Intent intent = new Intent(action);
+
+        Log.d("BLE", "broadcast update");
+
+        // This is special handling for the Heart Rate Measurement profile. Data
+        // parsing is carried out as per profile specifications.
+        if (UUID_HEART_RATE_MEASUREMENT.equals(characteristic.getUuid())) {
+            int flag = characteristic.getProperties();
+            int format = -1;
+            if ((flag & 0x01) != 0) {
+                format = BluetoothGattCharacteristic.FORMAT_UINT16;
+                Log.d("TOTO", "Heart rate format UINT16.");
+            } else {
+                format = BluetoothGattCharacteristic.FORMAT_UINT8;
+                Log.d("TOTO", "Heart rate format UINT8.");
+            }
+            final int heartRate = characteristic.getIntValue(format, 1);
+            Log.d("TOTO", String.format("Received heart rate: %d", heartRate));
+            intent.putExtra(EXTRA_DATA, String.valueOf(heartRate));
+        } else {
+            // For all other profiles, writes the data formatted in HEX.
+            final byte[] data = characteristic.getValue();
+            if (data != null && data.length > 0) {
+                final StringBuilder stringBuilder = new StringBuilder(data.length);
+                for(byte byteChar : data)
+                    stringBuilder.append(String.format("%02X ", byteChar));
+                intent.putExtra(EXTRA_DATA, new String(data) + "\n" +
+                        stringBuilder.toString());
+            }
+        }
+        sendBroadcast(characteristic);
+    }
+
 }
