@@ -3,6 +3,8 @@ package com.example.alex.powy.fragment;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothClass;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
@@ -20,13 +22,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.alex.powy.R;
+import com.example.alex.powy.service.BluetoothLeService;
 import com.example.alex.powy.thread.BluetoothServer;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class settingsFragment extends Fragment implements View.OnClickListener {
 
@@ -50,6 +57,7 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
     private BluetoothServer blueServ;
 
     //ListView Bluetooth stuff
+    private ArrayList<BluetoothDevice> mDeviceList;
     private BroadcastReceiver mReceiver;
     private ArrayAdapter<String> mLeDeviceListAdapter;
     private boolean bluetoothState;
@@ -113,6 +121,8 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
             //getActivity().finish();
         }
 
+        mDeviceList = new ArrayList<>();
+
         //INIT VIEWABLE CONTENT
         bluetooth_button = (ImageView) v.findViewById(R.id.bluetooth);
         search_button = (ImageView) v.findViewById(R.id.search);
@@ -122,6 +132,16 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
         //INIT LIST VIEW
         mLeDeviceListAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item);
         listViewBluetooth.setAdapter(mLeDeviceListAdapter);
+
+        ListView listView = (ListView) getActivity().findViewById(R.id.listViewBluetooth);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                BluetoothDevice bluetoothDevice = mDeviceList.get(position);
+
+                //bluetoothDevice.connectGatt(getActivity(), false, new BluetoothLeService());
+            }
+        });
 
         //INIT BUTTONS
         initButton();
@@ -233,9 +253,9 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
 
     ScanCallback mLeScanCallBack = new ScanCallback() {
         public void onScanResult(int callbackType, ScanResult result) {
-            mLeDeviceListAdapter.add(result.getDevice().toString());
+            mLeDeviceListAdapter.add(String.format("%s", result.getDevice().getName()));
+            mDeviceList.add(result.getDevice());
             Log.d("BLE", "device found -> " + result.getDevice().toString());
-            //result.getDevice().connectGatt(getActivity(), false, new BluetoothLeService().star)
             mLeDeviceListAdapter.notifyDataSetChanged();
         }
     };
