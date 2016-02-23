@@ -29,12 +29,6 @@
             android:clickable="true"
             android:src="@drawable/ic_leak_remove_24dp"
             android:layout_marginRight="30dp" />
-        <ImageView
-            android:id="@+id/server"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:clickable="true"
-            android:src="@drawable/ic_portable_wifi_off_24dp" />
     </LinearLayout>
     <ListView
         android:id="@+id/listViewBluetooth"
