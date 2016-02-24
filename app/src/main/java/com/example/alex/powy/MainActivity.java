@@ -130,6 +130,11 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
     public void setBattery(View header) {
         //battery settings
         Intent batteryIntent = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
