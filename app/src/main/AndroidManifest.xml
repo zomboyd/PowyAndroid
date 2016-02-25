@@ -30,10 +30,6 @@
         <service android:name=".service.BluetoothLeService" />
 
         <activity
-            android:name=".DeviceControlActivity"
-            android:label="@string/title_activity_device_control"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".DeviceActivity"
             android:label="@string/title_activity_device"
             android:theme="@style/AppTheme.NoActionBar"></activity>
