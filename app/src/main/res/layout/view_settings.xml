@@ -35,6 +35,11 @@
             android:layout_height="40dp"
             android:clickable="true"
             android:src="@drawable/ic_portable_wifi_off_24dp" />
+        <TextView android:id="@+id/connection_state"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/state_disconnected"
+            android:textSize="18sp"/>
     </LinearLayout>
     <ListView
         android:id="@+id/listViewBluetooth"
@@ -42,4 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"/>
+    <ExpandableListView android:id="@+id/gatt_services_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 </LinearLayout>

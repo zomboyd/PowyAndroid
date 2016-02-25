@@ -1,71 +1,146 @@
 package com.example.alex.powy.fragment;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothServerSocket;
-import android.content.BroadcastReceiver;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanResult;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.alex.powy.DeviceActivity;
 import com.example.alex.powy.R;
-import com.example.alex.powy.thread.BluetoothServer;
+
+import java.util.ArrayList;
 
 public class settingsFragment extends Fragment implements View.OnClickListener {
 
-    //Graphic
+    /**
+     * Graphic
+     */
     private ImageView bluetooth_button;
     private ImageView search_button;
     private ImageView server_button;
-    private ListView listViewBluetooth;
+    private TextView mConnectionState;
 
-    //Basic Bluetooth stuff
+    /**
+     * Bluetooth objects
+     */
     private boolean supported;
     private BluetoothAdapter mBluetoothAdapter;
+    private Handler mHandler = new Handler();
+    private BluetoothLeScanner mBluetoothLeScanner;
+    private BluetoothGatt mBluetoothGatt;
 
-    //SERVER BLUETOOTH STUFF
-    private boolean serverState = false;
-    private BluetoothServer blueServ;
-
-    //ListView Bluetooth stuff
-    private BroadcastReceiver mReceiver;
-    private ArrayAdapter<String> adapter;
+    private ArrayList<BluetoothDevice> mDeviceList = new ArrayList<>();
+    private ArrayAdapter<String> mLeDeviceListAdapter;
     private boolean bluetoothState;
     private boolean searchState = false;
+
+
+    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
+    // Stops scanning after 10 seconds.
+    private static final long SCAN_PERIOD = 10000;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.view_settings, container, false);
 
-        //Bluetooth state
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        supported = mBluetoothAdapter != null;
+
+        /**
+         * verification of the SDK
+         */
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Android M Permission check 
+            if (getActivity().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("This app needs location access");
+                builder.setMessage("Please grant location access so this app can detect beacons.");
+                builder.setPositiveButton(android.R.string.ok, null);
+                builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+                    }
+                });
+                builder.show();
+            }
+        }
+
+        /**
+         * verify if BLE is supported
+         */
+        if (!(supported = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE))) {
+            Toast.makeText(getActivity(), "BLE not supported", Toast.LENGTH_SHORT).show();
+            //getActivity().finish();
+        }
+
+        /**
+         * setting the BluetoothAdapter and BluetoothLeScanner for API min 21
+         */
+        final BluetoothManager mBluetoothManager = (BluetoothManager) getActivity().getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = mBluetoothManager.getAdapter();
+
+        mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
+
+        /**
+         * verify if the bluetooth scanner is set
+         */
+        if (mBluetoothLeScanner == null) {
+            Toast.makeText(getActivity(), "bluetooth adapter null", Toast.LENGTH_SHORT).show();
+            //getActivity().finish();
+        }
 
         //INIT VIEWABLE CONTENT
+        /**
+         * initialising the view in the fragment
+         */
+        mConnectionState = (TextView) v.findViewById(R.id.connection_state);
         bluetooth_button = (ImageView) v.findViewById(R.id.bluetooth);
         search_button = (ImageView) v.findViewById(R.id.search);
         server_button = (ImageView) v.findViewById(R.id.server);
-        listViewBluetooth = (ListView) v.findViewById(R.id.listViewBluetooth);
+        ListView listViewBluetooth = (ListView) v.findViewById(R.id.listViewBluetooth);
 
-        //INIT LIST VIEW
-        adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item);
-        listViewBluetooth.setAdapter(adapter);
 
-        //SERVER BLUETOOTH
-        //visibleOn();
-        //blueServ = new BluetoothServer(mBluetoothAdapter);
-        //blueServ.run();
+        mLeDeviceListAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item);
+        listViewBluetooth.setAdapter(mLeDeviceListAdapter);
 
-        //INIT BUTTONS
+        listViewBluetooth.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                BluetoothDevice bluetoothDevice = mDeviceList.get(position);
+
+                final Intent intent = new Intent(getActivity(), DeviceActivity.class);
+                intent.putExtra(DeviceActivity.EXTRAS_DEVICE_NAME, bluetoothDevice.getName());
+                intent.putExtra(DeviceActivity.EXTRAS_DEVICE_ADDRESS, bluetoothDevice.getAddress());
+                startActivity(intent);
+            }
+        });
+
+        /**
+         * Adding on click action to the buttons
+         */
         initButton();
 
         return v;
@@ -75,53 +150,41 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bluetooth:
-                if (bluetoothState == true) {
+                if (bluetoothState) {
                     bluetoothState = false;
-                    turnOff();
-                    bluetooth_button.setImageResource(R.drawable.ic_bluetooth_disabled_24dp);
-                } else if (bluetoothState == false) {
+                    if (turnOff()) {
+                        bluetooth_button.setImageResource(R.drawable.ic_bluetooth_disabled_24dp);
+                    }
+                } else {
                     bluetoothState = true;
-                    turnOn();
-                    bluetooth_button.setImageResource(R.drawable.ic_bluetooth_24dp);
+                    if (turnOn()) {
+                        bluetooth_button.setImageResource(R.drawable.ic_bluetooth_24dp);
+                    }
                 }
                 break;
             case R.id.search: {
-                if (searchState == true) {
+                if (searchState) {
                     searchState = false;
-                    adapter.clear();
-                    adapter.notifyDataSetChanged();
+                    mLeDeviceListAdapter.clear();
+                    mLeDeviceListAdapter.notifyDataSetChanged();
                     mBluetoothAdapter.cancelDiscovery();
-                    getActivity().unregisterReceiver(mReceiver);
+                    if (mBluetoothGatt != null) {
+                        mBluetoothGatt.close();
+                        mBluetoothGatt = null;
+                    }
                     search_button.setImageResource(R.drawable.ic_leak_remove_24dp);
-                } else if (searchState == false) {
+                } else {
                     searchState = true;
-                    adapter.clear();
-                    adapter.notifyDataSetChanged();
-                    discoverable();
+                    mLeDeviceListAdapter.clear();
+                    mLeDeviceListAdapter.notifyDataSetChanged();
+                    scanLe(mBluetoothAdapter.enable());
                     search_button.setImageResource(R.drawable.ic_leak_add_24dp);
                 }
                 break;
             }
-            case R.id.server: {
-                if (serverState == true) {
-                    serverState = false;
-                    blueServ.cancel();
-                    visibleOff();
-                    server_button.setImageResource(R.drawable.ic_portable_wifi_off_24dp);
-                } else if (serverState == false) {
-                    serverState = true;
-                    visibleOn();
-                    blueServ = new BluetoothServer(mBluetoothAdapter);
-                    blueServ.run();
-                    server_button.setImageResource(R.drawable.ic_wifi_tethering_24dp);
-                }
-                break;
-            }
         }
-
     }
 
-    //INIT BUTTON
     public void initButton() {
         bluetooth_button.setOnClickListener(this);
         search_button.setOnClickListener(this);
@@ -135,11 +198,6 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    //CHECK IF BLUETOOTH IS SUPPORTED BY THE DEVICE
-    public boolean getIsSupported() {
-        return supported;
-    }
-
     // TURN ON/OFF BLUETOOTH
     public boolean turnOn() {
         if (supported && !mBluetoothAdapter.isEnabled()) {
@@ -151,6 +209,7 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
     }
 
     public boolean turnOff() {
+        Log.d("ONOFF", String.format("supported = %s , isEnabled = %s", supported, mBluetoothAdapter.isEnabled()));
         if (supported && mBluetoothAdapter.isEnabled()) {
             mBluetoothAdapter.disable();
             return true;
@@ -158,56 +217,40 @@ public class settingsFragment extends Fragment implements View.OnClickListener {
         return false;
     }
 
-    // SET DEVICE DISCOVER OR NOT
-    public boolean visibleOn() {
-        if (supported && mBluetoothAdapter.isEnabled()) {
-            Intent getVisible = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-            startActivity(getVisible);
-            return true;
-        }
-        return false;
-    }
 
-    public boolean visibleOff() {
-        if (supported && mBluetoothAdapter.isDiscovering() && mBluetoothAdapter.isEnabled()) {
-            mBluetoothAdapter.cancelDiscovery();
-            return true;
+    /**
+     * only supported in SDK 21+
+     */
+    ScanCallback mLeScanCallBack = new ScanCallback() {
+        public void onScanResult(int callbackType, ScanResult result) {
+            if (!mDeviceList.contains(result.getDevice())) {
+                mLeDeviceListAdapter.add(String.format("%s", result.getDevice().getName()));
+                mDeviceList.add(result.getDevice());
+                Log.d("BLE", "device found -> " + result.getDevice().getName() + ":" + result.getDevice().getAddress());
+                mLeDeviceListAdapter.notifyDataSetChanged();
+            }
         }
-        return false;
-    }
+    };
 
     // SEARCH LIST OF BLUETOOTH DEVICE
-    public void discoverable() {
-        mReceiver = new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                // When discovery finds a device
-                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                    // Get the BluetoothDevice object from the Intent
-                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    // Add the name and address to an array adapter to show in a ListView
-                    if (device.getName() == null) {
-                        adapter.add("Unknown Device: " + device.getAddress());
-                        Log.d("TEST", "Unknown Device: " + device.getAddress() + " \n " + device.getUuids());
-                    }
-                    else {
-                        adapter.add(device.getName() + ": " + device.getAddress());
-                        Log.d("TEST", device.getName() + ": " + device.getAddress() + " \n " + device.getUuids());
-                    }
-                    adapter.notifyDataSetChanged();
-                } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                    adapter.clear();
-                    adapter.notifyDataSetChanged();
-                    Log.d("Bluetooth", "relauch");
-                    mBluetoothAdapter.startDiscovery();
+    public void scanLe(final boolean enable) {
+        if (enable) {
+            Log.d("SCAN", "in enable");
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mBluetoothLeScanner.stopScan(mLeScanCallBack);
                 }
-            }
-        };
-        mBluetoothAdapter.startDiscovery();
-        // Register the BroadcastReceiver
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(BluetoothDevice.ACTION_FOUND);
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        getActivity().registerReceiver(mReceiver, filter);
+            }, SCAN_PERIOD);
+            mBluetoothLeScanner.startScan(mLeScanCallBack);
+        } else {
+            mBluetoothLeScanner.stopScan(mLeScanCallBack);
+        }
+    }
+
+    private void updateConnectionState(final int resourceId) {
+        Log.d("UPDATE", "connection state updated");
+        mConnectionState = (TextView) getActivity().findViewById(R.id.connection_state);
+        mConnectionState.setText(resourceId);
     }
 }

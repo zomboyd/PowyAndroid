@@ -12,24 +12,19 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.alex.powy.controller.TransformBMP;
-import com.example.alex.powy.controller.connectionController;
 import com.example.alex.powy.fragment.aroundMeFragment;
 import com.example.alex.powy.fragment.bagInfoFragment;
 import com.example.alex.powy.fragment.dashboardFragment;
 import com.example.alex.powy.fragment.ownerFragment;
 import com.example.alex.powy.fragment.settingsFragment;
-import com.example.alex.powy.service.BluetoothService;
 import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity
@@ -135,6 +130,11 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
     public void setBattery(View header) {
         //battery settings
         Intent batteryIntent = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
@@ -160,17 +160,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
-
-    // Method to start the service bluetooth
-    public void startService(View view) {
-        startService(new Intent(getBaseContext(), BluetoothService.class));
-    }
-
-    // Method to stop the service bluetooth
-    public void stopService(View view) {
-        stopService(new Intent(getBaseContext(), BluetoothService.class));
-    }
-
 
     //public void ButtonOnClick(View v) {
     //switch (v.getId()) {

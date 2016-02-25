@@ -12,4 +12,22 @@
     <string name="title_activity_owner">ownerActivity</string>
     <string name="title_activity_bag_info">bagInfoActivity</string>
     <string name="dashboard">Dashboard</string>
+    <string name="state_connected">Connected</string>
+    <string name="state_disconnected">Disconnected</string>
+    <string name="unknown_service">unknown device</string>
+    <string name="unknown_characteristic">unknown characteristic</string>
+    <string name="label_device_address">adresse</string>
+    <string name="label_state">State</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="label_data">data</string>
+    <string name="no_data">no data</string>
+    <string name="connected">Connected</string>
+    <string name="menu_connect">Connect</string>
+    <string name="menu_disconnect">Diconnect</string>
+    <string name="title_activity_device_control">DeviceControlActivity</string>
+    <string name="title_activity_device">DeviceActivity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_device_activty">DeviceActivty</string>
 </resources>
